@@ -151,3 +151,26 @@ func (t *CommonTarget) RemoveLabel(labelName string) error {
 
 	return err
 }
+
+func (t *CommonTarget) GetLabels() []*codehost.Label {
+	ctx := t.ctx
+	targetEntity := t.targetEntity
+	owner := targetEntity.Owner
+	repo := targetEntity.Repo
+	number := targetEntity.Number
+
+	_, _, err := t.githubClient.GetLabels(ctx, owner, repo, number, labels)
+
+
+	issue := t.issue
+	labels := make([]*codehost.Label, len(issue.Labels))
+
+	for i, label := range issue.Labels {
+		labels[i] = &codehost.Label{
+			ID:   *label.ID,
+			Name: *label.Name,
+		}
+	}
+
+	return labels
+}
