@@ -189,37 +189,3 @@ func (t *CommonTarget) GetLabels() []*codehost.Label {
 	return nil
 
 }
-
-// func (t *CommonTarget) GetLabels() []*codehost.Label {
-
-// entityType := t.GetTargetEntity()
-
-// if entityType.Kind == "pull_request" {
-// 	pr := t.pullRequest
-// 	labels := make([]*codehost.Label, len(pr.Labels))
-
-// 	for i, label := range pr.Labels {
-// 		labels[i] = &codehost.Label{
-// 			ID:   *label.ID,
-// 			Name: *label.Name,
-// 		}
-// 	}
-
-// 	return labels
-
-// } else if t.targetEntity.Kind == "issue" {
-// 	issue := t.issue
-// 	labels := make([]*codehost.Label, len(issue.Labels))
-
-// 	for i, label := range issue.Labels {
-// 		labels[i] = &codehost.Label{
-// 			ID:   *label.ID,
-// 			Name: *label.Name,
-// 		}
-// 	}
-
-// 	return labels
-// }
-
-// return nil
-// }
