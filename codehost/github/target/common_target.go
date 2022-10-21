@@ -16,13 +16,17 @@ type CommonTarget struct {
 	ctx          context.Context
 	targetEntity *handler.TargetEntity
 	githubClient *gh.GithubClient
+	issue        *github.Issue
+	pullRequest  *github.PullRequest
 }
 
-func NewCommonTarget(ctx context.Context, targetEntity *handler.TargetEntity, githubClient *gh.GithubClient) *CommonTarget {
+func NewCommonTarget(ctx context.Context, targetEntity *handler.TargetEntity, githubClient *gh.GithubClient, issue *github.Issue, pullRequest *github.PullRequest) *CommonTarget {
 	return &CommonTarget{
 		ctx,
 		targetEntity,
 		githubClient,
+		issue,
+		pullRequest,
 	}
 }
 
@@ -153,24 +157,69 @@ func (t *CommonTarget) RemoveLabel(labelName string) error {
 }
 
 func (t *CommonTarget) GetLabels() []*codehost.Label {
-	ctx := t.ctx
-	targetEntity := t.targetEntity
-	owner := targetEntity.Owner
-	repo := targetEntity.Repo
-	number := targetEntity.Number
+	switch t.targetEntity.Kind {
 
-	_, _, err := t.githubClient.GetLabels(ctx, owner, repo, number, labels)
+	case handler.PullRequest:
+		pr := t.pullRequest
+		labels := make([]*codehost.Label, len(pr.Labels))
 
-
-	issue := t.issue
-	labels := make([]*codehost.Label, len(issue.Labels))
-
-	for i, label := range issue.Labels {
-		labels[i] = &codehost.Label{
-			ID:   *label.ID,
-			Name: *label.Name,
+		for i, label := range pr.Labels {
+			labels[i] = &codehost.Label{
+				ID:   *label.ID,
+				Name: *label.Name,
+			}
 		}
+
+		return labels
+
+	case handler.Issue:
+		issue := t.issue
+		labels := make([]*codehost.Label, len(issue.Labels))
+
+		for i, label := range issue.Labels {
+			labels[i] = &codehost.Label{
+				ID:   *label.ID,
+				Name: *label.Name,
+			}
+		}
+
+		return labels
 	}
 
-	return labels
+	return nil
+
 }
+
+// func (t *CommonTarget) GetLabels() []*codehost.Label {
+
+// entityType := t.GetTargetEntity()
+
+// if entityType.Kind == "pull_request" {
+// 	pr := t.pullRequest
+// 	labels := make([]*codehost.Label, len(pr.Labels))
+
+// 	for i, label := range pr.Labels {
+// 		labels[i] = &codehost.Label{
+// 			ID:   *label.ID,
+// 			Name: *label.Name,
+// 		}
+// 	}
+
+// 	return labels
+
+// } else if t.targetEntity.Kind == "issue" {
+// 	issue := t.issue
+// 	labels := make([]*codehost.Label, len(issue.Labels))
+
+// 	for i, label := range issue.Labels {
+// 		labels[i] = &codehost.Label{
+// 			ID:   *label.ID,
+// 			Name: *label.Name,
+// 		}
+// 	}
+
+// 	return labels
+// }
+
+// return nil
+// }

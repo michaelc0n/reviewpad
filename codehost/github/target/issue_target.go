@@ -25,9 +25,9 @@ type IssueTarget struct {
 // ensure IssueTarget conforms to Target interface
 var _ codehost.Target = (*IssueTarget)(nil)
 
-func NewIssueTarget(ctx context.Context, targetEntity *handler.TargetEntity, githubClient *gh.GithubClient, issue *github.Issue) *IssueTarget {
+func NewIssueTarget(ctx context.Context, targetEntity *handler.TargetEntity, githubClient *gh.GithubClient, issue *github.Issue, pullRequest *github.PullRequest) *IssueTarget {
 	return &IssueTarget{
-		NewCommonTarget(ctx, targetEntity, githubClient),
+		NewCommonTarget(ctx, targetEntity, githubClient, issue, pullRequest),
 		ctx,
 		targetEntity,
 		githubClient,
@@ -61,20 +61,6 @@ func (t *IssueTarget) Close(comment string) error {
 
 	return err
 }
-
-// func (t *IssueTarget) GetLabels() []*codehost.Label {
-// 	issue := t.issue
-// 	labels := make([]*codehost.Label, len(issue.Labels))
-
-// 	for i, label := range issue.Labels {
-// 		labels[i] = &codehost.Label{
-// 			ID:   *label.ID,
-// 			Name: *label.Name,
-// 		}
-// 	}
-
-// 	return labels
-// }
 
 func (t *IssueTarget) GetAuthor() (*codehost.User, error) {
 	issue := t.issue

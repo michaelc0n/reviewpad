@@ -145,6 +145,17 @@ func TestNewEvalEnv(t *testing.T) {
 		assert.FailNow(t, "couldn't get pull request", err)
 	}
 
+	mockedIssue, _, err := mockedGithubClientREST.Issues.Get(
+		ctx,
+		aladino.DefaultMockPrOwner,
+		aladino.DefaultMockPrRepoName,
+		aladino.DefaultMockPrNum,
+	)
+
+	if err != nil {
+		assert.FailNow(t, "couldn't get issue", err)
+	}
+
 	mockedGithubClient := gh.NewGithubClient(mockedGithubClientREST, nil)
 
 	gotEnv, err := aladino.NewEvalEnv(
@@ -157,7 +168,7 @@ func TestNewEvalEnv(t *testing.T) {
 		aladino.MockBuiltIns(),
 	)
 
-	mockedTarget, _ := target.NewPullRequestTarget(ctx, aladino.DefaultMockTargetEntity, mockedGithubClient, mockedPullRequest)
+	mockedTarget, _ := target.NewPullRequestTarget(ctx, aladino.DefaultMockTargetEntity, mockedGithubClient, mockedPullRequest, mockedIssue)
 
 	wantEnv := &aladino.BaseEnv{
 		Ctx:          ctx,

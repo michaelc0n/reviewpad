@@ -6,6 +6,7 @@ package target
 
 import (
 	"context"
+
 	"github.com/google/go-github/v45/github"
 	"github.com/reviewpad/reviewpad/v3/codehost"
 	gh "github.com/reviewpad/reviewpad/v3/codehost/github"
@@ -50,14 +51,14 @@ func getPullRequestPatch(ctx context.Context, pullRequest *github.PullRequest, g
 	return Patch(patchMap), nil
 }
 
-func NewPullRequestTarget(ctx context.Context, targetEntity *handler.TargetEntity, githubClient *gh.GithubClient, pr *github.PullRequest) (*PullRequestTarget, error) {
+func NewPullRequestTarget(ctx context.Context, targetEntity *handler.TargetEntity, githubClient *gh.GithubClient, pr *github.PullRequest, issue *github.Issue) (*PullRequestTarget, error) {
 	patch, err := getPullRequestPatch(ctx, pr, githubClient)
 	if err != nil {
 		return nil, err
 	}
 
 	return &PullRequestTarget{
-		NewCommonTarget(ctx, targetEntity, githubClient),
+		NewCommonTarget(ctx, targetEntity, githubClient, issue, pr),
 		ctx,
 		pr,
 		githubClient,
@@ -96,20 +97,6 @@ func (t *PullRequestTarget) GetAuthor() (*codehost.User, error) {
 	return &codehost.User{
 		Login: *pr.User.Login,
 	}, nil
-}
-
-func (t *PullRequestTarget) GetLabels() []*codehost.Label {
-	pr := t.PullRequest
-	labels := make([]*codehost.Label, len(pr.Labels))
-
-	for i, label := range pr.Labels {
-		labels[i] = &codehost.Label{
-			ID:   *label.ID,
-			Name: *label.Name,
-		}
-	}
-
-	return labels
 }
 
 func (t *PullRequestTarget) GetProjectByName(name string) (*codehost.Project, error) {

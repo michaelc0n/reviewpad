@@ -133,19 +133,30 @@ func NewEvalEnv(
 	switch targetEntity.Kind {
 	case handler.Issue:
 
-		issue, _, err := githubClient.GetIssue(ctx, targetEntity.Owner, targetEntity.Repo, targetEntity.Number)
-		if err != nil {
-			return nil, err
-		}
-
-		input.Target = target.NewIssueTarget(ctx, targetEntity, githubClient, issue)
-	case handler.PullRequest:
 		pullRequest, _, err := githubClient.GetPullRequest(ctx, targetEntity.Owner, targetEntity.Repo, targetEntity.Number)
 		if err != nil {
 			return nil, err
 		}
 
-		pullRequestTarget, err := target.NewPullRequestTarget(ctx, targetEntity, githubClient, pullRequest)
+		issue, _, err := githubClient.GetIssue(ctx, targetEntity.Owner, targetEntity.Repo, targetEntity.Number)
+		if err != nil {
+			return nil, err
+		}
+
+		input.Target = target.NewIssueTarget(ctx, targetEntity, githubClient, issue, pullRequest)
+
+	case handler.PullRequest:
+		issue, _, err := githubClient.GetIssue(ctx, targetEntity.Owner, targetEntity.Repo, targetEntity.Number)
+		if err != nil {
+			return nil, err
+		}
+
+		pullRequest, _, err := githubClient.GetPullRequest(ctx, targetEntity.Owner, targetEntity.Repo, targetEntity.Number)
+		if err != nil {
+			return nil, err
+		}
+
+		pullRequestTarget, err := target.NewPullRequestTarget(ctx, targetEntity, githubClient, pullRequest, issue)
 		if err != nil {
 			return nil, err
 		}
